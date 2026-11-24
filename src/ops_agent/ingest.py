@@ -27,7 +27,7 @@ import csv
 import re
 import unicodedata
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 from .agents.base import spec_numbers
 from .compliance import ComplianceChecker
@@ -102,9 +102,17 @@ def resolve_ingest_path(raw, root: Path | str | None = None) -> tuple[Path, str]
         raise IngestError("empty_path", "path 不能为空")
 
     candidate = Path(text)
-    if candidate.is_absolute() or candidate.drive or text[:1] in ("/", "\\"):
+    windows_candidate = PureWindowsPath(text)
+    if (
+        candidate.is_absolute()
+        or candidate.drive
+        or windows_candidate.drive
+        or text[:1] in ("/", "\\")
+    ):
         raise IngestError("absolute_path", f"只接受 {base.name}/ 下的相对路径：{text}")
-    if any(part == ".." for part in candidate.parts):
+    if any(part == ".." for part in candidate.parts) or any(
+        part == ".." for part in windows_candidate.parts
+    ):
         raise IngestError("path_traversal", f"路径不允许包含 ..：{text}")
     if candidate.suffix.lower() != ".csv":
         raise IngestError("bad_extension", f"只支持 .csv：{text}")
