@@ -10,6 +10,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+from ops_agent.config import DATA_DIR  # noqa: E402
 from ops_agent.experiment import build_record  # noqa: E402
 from ops_agent.memory import MemoryStore  # noqa: E402
 from ops_agent.cli import (  # noqa: E402
@@ -131,6 +132,9 @@ class RoutingTests(unittest.TestCase):
 class DueExperimentTests(unittest.TestCase):
     """The director judges closed experiments itself: copy only, no model call."""
 
+    HAS_STORE = (DATA_DIR / "skus.json").exists() and (DATA_DIR / "performance.csv").exists()
+    SKIP_REASON = "simulated store not generated (run: python run.py seed)"
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.memory = MemoryStore(Path(self.tmp.name))
@@ -151,6 +155,7 @@ class DueExperimentTests(unittest.TestCase):
         self.memory.append_experiment(record)
         return record
 
+    @unittest.skipUnless(HAS_STORE, SKIP_REASON)
     def test_closed_experiment_is_judged_and_saved(self):
         self.add("2026-10-10")
         judged = _judge_due_experiments(self.memory, as_of="2026-11-03")
@@ -165,6 +170,7 @@ class DueExperimentTests(unittest.TestCase):
         self.assertEqual(_judge_due_experiments(self.memory, as_of="2026-11-03"), [])
         self.assertEqual(self.memory.read_experiments(limit=5)[0]["verdict"], "")
 
+    @unittest.skipUnless(HAS_STORE, SKIP_REASON)
     def test_already_judged_is_not_recounted(self):
         self.add("2026-10-10")
         _judge_due_experiments(self.memory, as_of="2026-11-03")

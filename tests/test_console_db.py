@@ -6,6 +6,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from ops_agent.config import DATA_DIR  # noqa: E402
+_HAS_SITE_SNAPSHOT = (DATA_DIR / "site_snapshot.json").exists()
 from ops_agent.console.auth import UserStore  # noqa: E402
 from ops_agent.console.connectors import ConnectorError, build_site  # noqa: E402
 from ops_agent.console.db import ConsoleDB, SQLiteTenantStore, SQLiteUserStore  # noqa: E402
@@ -74,6 +75,7 @@ class ConsoleDBTests(unittest.TestCase):
         with self.assertRaises(ConnectorError):
             build_site(tenant)
 
+    @unittest.skipUnless(_HAS_SITE_SNAPSHOT, "site snapshot not generated (run: python run.py site sync)")
     def test_snapshot_site_is_preview_only(self):
         site = SnapshotSite(DATA_DIR / "site_snapshot.json")
         products = site.all_products()

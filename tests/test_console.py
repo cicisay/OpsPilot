@@ -11,6 +11,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from ops_agent.config import DATA_DIR  # noqa: E402
+_HAS_TENANT_DATA = (DATA_DIR / "tenants" / "globaltrade" / "task_orders.json").exists()
 from ops_agent.console.app import ConsoleApp, agent_metadata, _snapshot_baseline  # noqa: E402
 from ops_agent.console.audit import AuditDB  # noqa: E402
 from ops_agent.console.auth import (  # noqa: E402
@@ -284,6 +285,7 @@ class ConsoleHTTPTests(unittest.TestCase):
         self.assertEqual(status, 200, payload)
         return payload["csrf"]
 
+    @unittest.skipUnless(_HAS_TENANT_DATA, "demo tenant data not generated (run: python run.py seed)")
     def test_login_me_and_overview(self):
         csrf = self.login("admin", "admin-pass-1")
         status, payload = self.request("GET", "/api/me")
