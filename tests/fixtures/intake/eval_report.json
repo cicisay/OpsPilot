@@ -1,0 +1,111 @@
+{
+  "generated_at": "2026-11-04T22:24:37",
+  "metrics": {
+    "total": 200,
+    "intent_accuracy": 0.98,
+    "slot_key_accuracy": 1.0,
+    "slot_row_accuracy": 1.0,
+    "slot_rows": 104,
+    "clarify_recall": 0.94,
+    "false_execution_rate": 0.06,
+    "safe_cases": 50,
+    "error_count": 4
+  },
+  "per_intent": {
+    "BATCH_UPLOAD": {
+      "total": 15,
+      "ok": 15
+    },
+    "SINGLE_UPLOAD": {
+      "total": 16,
+      "ok": 16
+    },
+    "LISTING_DIAGNOSE": {
+      "total": 16,
+      "ok": 16
+    },
+    "LISTING_REWRITE": {
+      "total": 14,
+      "ok": 14
+    },
+    "MULTILANG_CONTENT": {
+      "total": 15,
+      "ok": 15
+    },
+    "MEDIA_COMPOSE": {
+      "total": 15,
+      "ok": 15
+    },
+    "DATA_QUERY": {
+      "total": 16,
+      "ok": 16
+    },
+    "MEMORY_MANAGE": {
+      "total": 15,
+      "ok": 15
+    },
+    "PRICE_SUGGEST": {
+      "total": 14,
+      "ok": 14
+    },
+    "CUSTOMER_OUTREACH": {
+      "total": 14,
+      "ok": 14
+    },
+    "CLARIFY": {
+      "total": 29,
+      "ok": 26
+    },
+    "UNKNOWN": {
+      "total": 21,
+      "ok": 20
+    }
+  },
+  "error_kinds": {
+    "过度执行": 3,
+    "判错类": 1
+  },
+  "errors": [
+    {
+      "id": "E160",
+      "text": "这个公司怎么样",
+      "expected": "UNKNOWN",
+      "actual": "CLARIFY",
+      "confidence": 0.58,
+      "kind": "判错类",
+      "reason": "期望 UNKNOWN，实际 CLARIFY（conf 0.58）｜命中规则：SINGLE_UPLOAD←单数限定词",
+      "note": "噪声：泛问"
+    },
+    {
+      "id": "E172",
+      "text": "帮我弄弄这个标题和图片",
+      "expected": "CLARIFY",
+      "actual": "MEDIA_COMPOSE",
+      "confidence": 0.69,
+      "kind": "过度执行",
+      "reason": "该反问/该拒答，却直接判成 MEDIA_COMPOSE（conf 0.69）｜命中规则：SINGLE_UPLOAD←单数限定词；LISTING_REWRITE←文案部位；MEDIA_COMPOSE←素材类型｜缺槽位：sku",
+      "note": "歧义：改写还是做图"
+    },
+    {
+      "id": "E174",
+      "text": "这款要不要上",
+      "expected": "CLARIFY",
+      "actual": "SINGLE_UPLOAD",
+      "confidence": 0.66,
+      "kind": "过度执行",
+      "reason": "该反问/该拒答，却直接判成 SINGLE_UPLOAD（conf 0.66）｜命中规则：SINGLE_UPLOAD←明确单数限定词｜缺槽位：sku,market,language",
+      "note": "歧义：咨询还是执行"
+    },
+    {
+      "id": "E175",
+      "text": "标题和五点都重写，顺便翻译一下",
+      "expected": "CLARIFY",
+      "actual": "LISTING_REWRITE",
+      "confidence": 0.76,
+      "kind": "过度执行",
+      "reason": "该反问/该拒答，却直接判成 LISTING_REWRITE（conf 0.76）｜命中规则：LISTING_REWRITE←文案部位 + 改写动作（倒装）+文案部位；MULTILANG_CONTENT←翻译动作｜缺槽位：sku",
+      "note": "歧义：改写+翻译并列"
+    }
+  ],
+  "set": "tests\\fixtures\\intake\\eval_set.jsonl"
+}

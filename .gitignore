@@ -1,0 +1,29 @@
+__pycache__/
+*.py[cod]
+.venv/
+
+# Secrets. LLM_API_KEY / SITE_AGENT_TOKEN live here and nowhere else.
+.env
+.env.local
+*.pem
+
+# Runtime state. Never commit: it carries credentials and merchant data.
+#   data/console/users.json     PBKDF2 password hashes
+#   data/console/console.db     users + tenants
+#   data/console/audit.db       who logged in from which IP, every publish
+#   data/llm_trace/*.jsonl      full prompts and replies, including merchant copy
+#   data/tenants/*              per-tenant snapshots, proposals, approvals
+#   data/approvals.json         live one-time tokens
+#
+# Everything here is created on demand by `run.py`, so a fresh clone needs no
+# placeholder file — and git cannot re-include a file inside an ignored tree,
+# so a `!data/.gitkeep` rule would only look like it works.
+data/
+
+# 本地前端快照与排版评审稿：只用于回退和看图，不进版本库
+backups/
+preview/
+
+# Local logs
+*.log
+

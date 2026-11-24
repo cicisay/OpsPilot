@@ -1,0 +1,1 @@
+"""OpsPilot standalone operations console."""

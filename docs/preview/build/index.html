@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#ffffff">
+  <title>OpsPilot · 跨境运营台</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+
+  <div id="login-view" class="login-wrap">
+    <form id="login-form" class="login-card" autocomplete="on" aria-labelledby="login-title">
+      <div class="brand-mark" aria-hidden="true">OP</div>
+      <h1 id="login-title">OpsPilot</h1>
+      <p class="muted">跨境商品运营台 · 内部登录</p>
+      <label for="username">账号</label>
+      <input id="username" name="username" autocomplete="username" required>
+      <label for="password">密码</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+      <button type="submit" class="primary">登录</button>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+  </div>
+
+  <div id="app-view" class="hidden">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark small" aria-hidden="true">OP</span>
+        <span>OpsPilot <em>运营台</em></span>
+      </div>
+      <div class="top-actions">
+        <label class="tenant-label" for="tenant-select">店铺</label>
+        <select id="tenant-select" aria-label="选择店铺"></select>
+        <span id="user-label" class="user-label"></span>
+        <button id="password-button" class="ghost" type="button">改密</button>
+        <button id="logout-button" class="ghost" type="button">退出</button>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="rail" aria-label="页面目录">
+        <nav id="rail-nav">
+          <a href="#overview" data-nav="overview" class="active"><span>总览</span></a>
+          <a href="#health-panel" data-nav="health-panel"><span>店铺体检</span></a>
+          <a href="#tasks-panel" data-nav="tasks-panel"><span>本周动作</span><span class="n" id="nav-tasks">0</span></a>
+          <a href="#proposals-panel" data-nav="proposals-panel"><span>方案与审批</span><span class="n" id="nav-proposals">0</span></a>
+          <a href="#runs-panel" data-nav="runs-panel"><span>运行记录</span><span class="n" id="nav-runs">0</span></a>
+          <a href="#memory-panel" data-nav="memory-panel"><span>记忆</span></a>
+          <a href="#admin-panel" data-nav="admin-panel" id="nav-admin"><span>系统管理</span></a>
+        </nav>
+        <div class="rail-foot" id="rail-foot">
+          <b>等待加载</b>
+          连接店铺后显示扫描信息
+        </div>
+      </aside>
+
+      <main class="page" id="main" tabindex="-1">
+        <section class="page-head" id="overview" aria-labelledby="tenant-title">
+          <div>
+            <p class="eyebrow" id="week-label">WEEKLY OPS</p>
+            <h1 id="tenant-title">运营总览</h1>
+            <p class="sub" id="tenant-subtitle">加载中…</p>
+          </div>
+          <div class="head-right">
+            <span class="hero-badge" id="site-status" role="status">站点未配置</span>
+            <span class="pill" id="pending-badge">待审 0</span>
+          </div>
+        </section>
+
+        <section id="stats" class="kpis" aria-label="关键指标"></section>
+        <div id="stats-mini" class="kpi-mini"></div>
+
+        <div class="workspace">
+          <div class="col-main">
+            <section id="health-panel" class="panel" aria-labelledby="health-heading">
+              <div class="panel-head">
+                <h2 id="health-heading">店铺体检 <span class="badge" id="health-score-badge"></span></h2>
+                <span class="hint" id="health-hint">主管每轮扫描后的结论与选品理由</span>
+              </div>
+              <div id="health-body" class="health-body"></div>
+              <div id="health-alerts" class="alert-row" role="status"></div>
+            </section>
+
+            <section id="tasks-panel" class="panel" aria-labelledby="tasks-heading">
+              <div class="panel-head">
+                <h2 id="tasks-heading">本周动作 <span class="badge" id="tasks-count">0</span></h2>
+                <span class="hint">主管诊断 → TaskOrder，版数由模型决定</span>
+              </div>
+              <div id="tasks-body" class="task-list"></div>
+            </section>
+
+            <section id="proposals-panel" class="panel" aria-labelledby="proposals-heading">
+              <div class="panel-head">
+                <h2 id="proposals-heading">方案与审批 <span class="badge" id="proposals-count">0 版</span></h2>
+                <span class="hint">点一行在右侧审批 · 合规四类由服务端判定</span>
+              </div>
+              <div id="proposals" class="proposal-list"></div>
+            </section>
+          </div>
+
+          <aside class="col-side">
+            <section class="panel detail-panel" id="detail-panel" aria-labelledby="detail-heading">
+              <div class="panel-head">
+                <h2 id="detail-heading">审批与发布</h2>
+                <span class="hint">令牌一次有效</span>
+              </div>
+              <div id="detail" class="detail empty">先选一个方案</div>
+              <div id="action-output" class="output hidden" role="status" aria-live="polite"></div>
+            </section>
+          </aside>
+        </div>
+
+        <section id="runs-panel" class="panel" aria-labelledby="runs-heading">
+          <div class="panel-head">
+            <h2 id="runs-heading">运行记录 <span class="badge" id="runs-count">0</span></h2>
+            <span class="hint">发布 → 观察 → 判定，一行一个版本</span>
+          </div>
+          <div id="experiment-summary" class="tally"></div>
+          <div class="table-wrap">
+            <table>
+              <caption class="sr-only">发布与实验运行记录</caption>
+              <thead>
+                <tr>
+                  <th scope="col">商品 / 版本</th>
+                  <th scope="col">状态</th>
+                  <th scope="col">判据</th>
+                  <th scope="col">基线 → 当前</th>
+                  <th scope="col">曝光</th>
+                  <th scope="col">结论</th>
+                </tr>
+              </thead>
+              <tbody id="runs-body"></tbody>
+            </table>
+          </div>
+          <ul class="lessons" id="lessons-list"></ul>
+        </section>
+
+        <section id="memory-panel" class="panel" aria-labelledby="memory-heading">
+          <div class="panel-head">
+            <h2 id="memory-heading">记忆</h2>
+            <span class="hint">只读 · 主管写入</span>
+          </div>
+          <div id="memory-summary" class="mem"></div>
+          <div class="tabs" role="tablist" aria-label="记忆分类">
+            <button type="button" role="tab" class="tab active" data-memory-tab="profile" aria-selected="true">店铺画像</button>
+            <button type="button" role="tab" class="tab" data-memory-tab="decisions" aria-selected="false">决策</button>
+            <button type="button" role="tab" class="tab" data-memory-tab="lessons" aria-selected="false">经验库</button>
+            <button type="button" role="tab" class="tab" data-memory-tab="snapshots" aria-selected="false">快照回放</button>
+          </div>
+          <div id="memory-body" class="memory-body"></div>
+        </section>
+
+        <section id="admin-panel" class="panel hidden" aria-labelledby="admin-heading">
+          <div class="panel-head">
+            <h2 id="admin-heading">系统管理</h2>
+            <span class="hint">仅管理员</span>
+          </div>
+          <form id="user-form" class="inline-form">
+            <input id="new-username" placeholder="账号" autocomplete="off" aria-label="新账号" required>
+            <input id="new-password" type="password" placeholder="初始密码（≥8 位）" autocomplete="new-password" aria-label="初始密码，至少 8 位" required>
+            <select id="new-role" aria-label="角色">
+              <option value="operator">operator</option>
+              <option value="approver">approver</option>
+              <option value="admin">admin</option>
+            </select>
+            <input id="new-tenants" value="globaltrade" placeholder="租户，逗号分隔" autocomplete="off" aria-label="租户，逗号分隔">
+            <button type="submit" class="primary">创建用户</button>
+          </form>
+          <div class="table-wrap">
+            <table>
+              <caption class="sr-only">用户列表</caption>
+              <thead>
+                <tr>
+                  <th scope="col">账号</th>
+                  <th scope="col">角色</th>
+                  <th scope="col">租户</th>
+                  <th scope="col">状态</th>
+                  <th scope="col">操作</th>
+                </tr>
+              </thead>
+              <tbody id="users-body"></tbody>
+            </table>
+          </div>
+
+          <div class="divider divider-lg"></div>
+
+          <div class="audit" id="audit-panel">
+            <div class="audit-head">
+              <button type="button" class="audit-toggle" id="audit-toggle" aria-expanded="false" aria-controls="audit-region">
+                <svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5"/></svg>
+                <span class="audit-title">审计日志</span>
+                <span class="audit-count" id="audit-count">最近 5 条</span>
+              </button>
+              <div class="audit-actions">
+                <button id="export-audit" class="ghost" type="button">导出 CSV</button>
+                <button id="refresh-audit" class="ghost" type="button">刷新</button>
+              </div>
+            </div>
+            <div id="audit-region">
+              <table>
+                <caption class="sr-only">审计日志</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">时间</th>
+                    <th scope="col">操作人</th>
+                    <th scope="col">动作</th>
+                    <th scope="col">租户</th>
+                    <th scope="col">对象</th>
+                    <th scope="col">结果</th>
+                  </tr>
+                </thead>
+                <tbody id="audit-body"></tbody>
+              </table>
+            </div>
+            <div class="audit-foot">
+              <span id="audit-foot-note">收起状态只显示最近 5 条；展开后在面板内滚动</span>
+              <button type="button" class="linklike" id="audit-more" aria-expanded="false">展开全部</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="password-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="password-title">
+    <div class="modal-card">
+      <h2 id="password-title">修改密码</h2>
+      <form id="password-form">
+        <label for="old-password">原密码</label>
+        <input id="old-password" type="password" autocomplete="current-password" required>
+        <label for="new-password-self">新密码</label>
+        <input id="new-password-self" type="password" autocomplete="new-password" required>
+        <label for="confirm-password">确认新密码</label>
+        <input id="confirm-password" type="password" autocomplete="new-password" required>
+        <p id="password-error" class="error" role="alert"></p>
+        <div class="modal-actions">
+          <button type="button" id="cancel-password" class="ghost">取消</button>
+          <button type="submit" class="primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+    <script>
+  // ===== 预览专用：拦截 API，注入真实导出数据（不改动项目源码） =====
+  (function () {
+    const params = new URLSearchParams(location.search);
+    const loginOnly = params.get("view") === "login";
+    const origFetch = window.fetch.bind(window);
+    let DATA = null;
+    const load = async () => {
+      if (DATA) return DATA;
+      const resp = await origFetch("data.json");
+      DATA = await resp.json();
+      return DATA;
+    };
+    window.fetch = async (input, init) => {
+      const url = new URL(typeof input === "string" ? input : input.url, location.href);
+      const path = url.pathname.replace(/\/+$/, "") || "/";
+      if (!path.startsWith("/api/")) return origFetch(input, init);
+      if (loginOnly) {
+        return new Response(JSON.stringify({ ok: false, error: "请先登录" }),
+          { status: 401, headers: { "Content-Type": "application/json" } });
+      }
+      const data = await load();
+      const key = path === "/api/audit" ? path + url.search : path;
+      const table = {
+        "/api/me": data.me,
+        "/api/tenants": data.tenants,
+        "/api/users": data.users,
+        "/api/audit?limit=100": data.audit,
+      };
+      let hit = table[key];
+      if (!hit) {
+        const m = path.match(/^\/api\/tenants\/([a-z0-9-]+)\/overview$/);
+        if (m) hit = data["overview:" + m[1]];
+      }
+      if (!hit) {
+        return new Response(JSON.stringify({ ok: false, error: "预览模式不支持该操作" }),
+          { status: 400, headers: { "Content-Type": "application/json" } });
+      }
+      return new Response(JSON.stringify(hit),
+        { status: 200, headers: { "Content-Type": "application/json" } });
+    };
+    const only = params.get("only");
+    if (only) {
+      const css = ["health-panel", "tasks-panel", "proposals-panel"].includes(only)
+        ? `#main > :not(.workspace){display:none!important}
+           .col-main > :not(#${only}){display:none!important}
+           .col-side{display:none!important}`
+        : `#main > :not(.workspace):not(#${only}){display:none!important}
+           .workspace{display:none!important}`;
+      const style = document.createElement("style");
+      style.textContent = css;
+      document.addEventListener("DOMContentLoaded", () => document.head.appendChild(style));
+    }
+  })();
+  </script>
+  <script src="./app.js"></script>
+</body>
+</html>
