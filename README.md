@@ -11,7 +11,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![GitHub](https://img.shields.io/badge/github-cicisay-181717?logo=github&logoColor=white)](https://github.com/cicisay)
 
-![OpsPilot 运营台总览](docs/preview/shots/02-overview-top.png)
+![OpsPilot 运营台总览](docs/assets/overview.png)
 
 ---
 

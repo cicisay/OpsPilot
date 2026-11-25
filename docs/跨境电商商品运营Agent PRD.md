@@ -544,7 +544,6 @@
 | Agent 主项目 | 本仓库根目录 |
 | 真实店铺 | 由 `SITE_AGENT_BASE_URL` 配置 |
 | 本 PRD（v1.1，Markdown 主稿） | docs/跨境电商商品运营Agent PRD.md |
-| 审计报告 | docs/audit-2026-10-30.md |
 | P0 说明 | docs\step-07-p0-hardening.md |
 | OpsPilot 说明 | docs\step-08-ops-console.md |
 | 用户/审计/TLS 说明 | docs\step-09-user-audit-tls.md |
